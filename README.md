@@ -1,10 +1,23 @@
 # proxybench
 
+> Evidence-first benchmarking for proxy and web-retrieval workloads.
+
 **Measure usable results, not proxy count.**
 
-`proxybench` is a local, deterministic benchmark utility for proxy and web-retrieval workloads. It compares sanitized request outcomes using metrics that matter to operators: usable success rate, requests per usable result, rotations per usable result, latency, and cost per usable result.
+`proxybench` is a local, deterministic Python utility for comparing sanitized retrieval outcomes using metrics that matter to operators: usable success rate, requests per usable result, rotations per usable result, latency, and cost per usable result.
+
+**Status:** alpha · Python 3.10+ · zero runtime dependencies · local-only · no telemetry
 
 Built by **PN Labs**.
+
+## PN Labs reliability toolkit
+
+| Project | Purpose |
+| --- | --- |
+| [**proxy-outcome**](https://github.com/pnlabs-dev/proxy-outcome) | Classify what happened without over-attributing the cause |
+| **proxybench** | Compare usable-result efficiency between retrieval policies |
+
+The tools are intentionally separate: classify evidence first, then benchmark whether a policy actually improves outcomes.
 
 ## Why this exists
 
@@ -123,6 +136,10 @@ python scripts/public_hygiene_check.py
 ```
 
 CI installs the package before testing, smoke-tests the installed CLI, and runs a non-echoing vendor-neutral public repository hygiene gate.
+
+## Contributing
+
+Small, measurable improvements are welcome. See [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request.
 
 ## Security
 
