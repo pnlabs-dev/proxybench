@@ -1,0 +1,52 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Public repository hygiene check
+        run: python scripts/public_hygiene_check.py
+
+      - name: Install package from source
+        run: python -m pip install --disable-pip-version-check .
+
+      - name: Compile package
+        run: python -m compileall -q src
+
+      - name: Run tests against installed package
+        run: python -m unittest discover -s tests -v
+
+      - name: Installed CLI smoke tests
+        shell: bash
+        run: |
+          proxybench summarize examples/baseline.jsonl \
+            | python -c 'import json,sys; d=json.load(sys.stdin); assert d["requests"] == 20; assert d["usable_results"] == 13'
+
+          python -m proxybench compare examples/baseline.jsonl examples/candidate.jsonl \
+            --min-requests 20 \
+            --min-success-uplift-pp 10 \
+            --max-rpu-regression-pct 0 \
+            --max-cost-regression-pct 0 \
+            | python -c 'import json,sys; d=json.load(sys.stdin); assert d["gate"]["verdict"] == "PASS"'
